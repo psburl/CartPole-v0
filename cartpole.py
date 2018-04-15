@@ -79,7 +79,7 @@ class Cartpole:
         if not model:
             model = self.BuildNeuralNetworkModel(inputSize = len(X[0]))
 
-        model.fit({'input': X}, {'targets': y}, n_epoch=4, snapshot_step=500)
+        model.fit({'input': X}, {'targets': y}, n_epoch=4, snapshot_step=500, run_id='cartpole')
         return model   
 
     def Solve(self):     
