@@ -1,3 +1,6 @@
+#Romulo Marchioro Rossi - Wesley Burlani
+#Federal University of Fronteira Sul - 2018.1 - Artificial Inteligence
+
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -17,12 +20,11 @@ class Cartpole:
         self.scoreRequirement = 100
         self.initialGames = 50 
         self.trainDataFile = 'saved.npy'
+        self.actionsLogFile = 'actionsLog.txt'
     
     def BuildTrainingData(self):
-        
         if os.path.isfile(self.trainDataFile):
             return np.load(self.trainDataFile)
-            
         trainingData = []
         acceptedScores = []
         while(len(acceptedScores) < self.initialGames):
@@ -61,7 +63,6 @@ class Cartpole:
         return trainingData
 
     def BuildNeuralNetworkModel(self,inputSize):
-        
         network = input_data(shape=[None, inputSize, 1], name = 'input')
         network = fully_connected(network, 8, activation = 'relu')		
         network = fully_connected(network, 2, activation='softmax')
@@ -69,29 +70,27 @@ class Cartpole:
         model = tflearn.DNN(network, tensorboard_dir='log')
         return model
 
-    def TrainModel(self, trainingData, model=False):
-
+    def TrainModel(self, trainingData):
         X = np.array([i[0] for i in trainingData]).reshape(-1,len(trainingData[0][0]),1)
         y = [i[1] for i in trainingData]
-
-        if not model:
-            model = self.BuildNeuralNetworkModel(inputSize = len(X[0]))
-
+        model = self.BuildNeuralNetworkModel(inputSize = len(X[0]))
         model.fit({'input': X}, {'targets': y}, n_epoch=4, snapshot_step=500, run_id='cartpole')
         return model   
 
     def Solve(self):     
         trainingData = self.BuildTrainingData()
         model = self.TrainModel(trainingData)
-
         scores = []
         choices = []
+        allMemory = []
+        logActions = ""
+
         for trial in range(100):
             score = 0
             gameMemory = []
             previousObservation = []
             self.enviroment.reset()
-            
+            logActions+= "trial " + str(trial) + "\n"
             while True:
                 self.enviroment.render()
 
@@ -101,13 +100,17 @@ class Cartpole:
                     action = np.argmax(model.predict(previousObservation.reshape(-1,len(previousObservation),1))[0])
 
                 choices.append(action)      
-                newObservation, reward, done, info = self.enviroment.step(action)
-                previousObservation = newObservation
-                gameMemory.append([newObservation, action])
+                observation, reward, done, info = self.enviroment.step(action)
+                gameMemory.append([previousObservation, action])
+                logActions += "\t\t".join(("%8.5f" % e) for e in previousObservation) + "\t\t" + str(action) + "\n"
+                previousObservation = observation
                 score+=reward
                 if done: 
                     break
-                    
+            
+            text_file = open(self.actionsLogFile, "w")
+            text_file.write(logActions)
+            text_file.close()
             print('trial: {} score: {}'.format(trial,score))
             scores.append(score)
 
