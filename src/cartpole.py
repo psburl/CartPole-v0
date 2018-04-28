@@ -1,9 +1,12 @@
 #Romulo Marchioro Rossi - Wesley Burlani
 #Federal University of Fronteira Sul - 2018.1 - Artificial Inteligence
 
+#Removing some warnings
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning) 
 warnings.filterwarnings("ignore", category=UserWarning) 
+
+#importing code dependencies
 import numpy as np
 import tensorflow as tf
 try:
@@ -38,13 +41,13 @@ class Cartpole:
         print('Training data...')
         trainingData = []
         acceptedScores = []
-        while(len(acceptedScores) < self.initialGames):
+        while(len(acceptedScores) < self.initialGames): # trying to get #initialGames good games
             score = 0
             gameMemory = []
             previousObservation = [] 
 
             while True: 
-                action = self.enviroment.action_space.sample()
+                action = self.enviroment.action_space.sample() 
                 observation, reward, done, info = self.enviroment.step(action)
 
                 if len(previousObservation) > 0 :  #is not the first iteration
@@ -66,7 +69,7 @@ class Cartpole:
                 
             self.enviroment.reset()
 
-        np.save(self.trainingDataFileName, np.array(trainingData))
+        np.save(self.trainingDataFileName, np.array(trainingData)) # saving train data to avoid it all time.
         print('Average Accpeted score: ', mean(acceptedScores))
         print('Median accpeted score: ', median(acceptedScores))
         print(Counter(acceptedScores))
