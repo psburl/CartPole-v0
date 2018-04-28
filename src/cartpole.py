@@ -1,9 +1,17 @@
 #Romulo Marchioro Rossi - Wesley Burlani
 #Federal University of Fronteira Sul - 2018.1 - Artificial Inteligence
 
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
+warnings.filterwarnings("ignore", category=UserWarning) 
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
+try:
+    import matplotlib as mpl
+    mpl.use('TkAgg')
+    import mpl.pyplot as pl
+except:
+    import matplotlib.pyplot as pl
 import math
 import gym
 from statistics import median, mean
@@ -19,12 +27,15 @@ class Cartpole:
         self.enviroment.reset()
         self.scoreRequirement = 100
         self.initialGames = 50 
-        self.trainDataFile = 'saved.npy'
-        self.actionsLogFile = 'actionsLog.txt'
+        self.trainingDataFileName = 'saved.npy'
+        self.logActionsFileName = 'actionsLog.txt'
     
     def BuildTrainingData(self):
-        if os.path.isfile(self.trainDataFile):
-            return np.load(self.trainDataFile)
+        if os.path.isfile(self.trainingDataFileName):
+            print('Using previously data trained')
+            return np.load(self.trainingDataFileName)
+        
+        print('Training data...')
         trainingData = []
         acceptedScores = []
         while(len(acceptedScores) < self.initialGames):
@@ -55,8 +66,7 @@ class Cartpole:
                 
             self.enviroment.reset()
 
-        trainingDataSave = np.array(trainingData)
-        np.save(self.trainDataFile, trainingDataSave)
+        np.save(self.trainingDataFileName, np.array(trainingData))
         print('Average Accpeted score: ', mean(acceptedScores))
         print('Median accpeted score: ', median(acceptedScores))
         print(Counter(acceptedScores))
@@ -108,15 +118,16 @@ class Cartpole:
                 if done: 
                     break
             
-            text_file = open(self.actionsLogFile, "w")
-            text_file.write(logActions)
-            text_file.close()
             print('trial: {} score: {}'.format(trial,score))
             scores.append(score)
 
+        logActionsFile = open(self.logActionsFileName, "w")
+        logActionsFile.write(logActions)
+        logActionsFile.close()
         print('Average Score:', mean(scores))
         print('choice 1:{}  choice 0:{}'.format(choices.count(1)/len(choices),choices.count(0)/len(choices)))
-        print(self.scoreRequirement)
+        print('used score requirement: {}'.format(self.scoreRequirement))
 
+print('Starting program ....')
 cartpole = Cartpole()
 cartpole.Solve()
