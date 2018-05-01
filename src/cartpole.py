@@ -33,9 +33,9 @@ class Cartpole:
         self.trainingDataFileName = 'saved.npy'
         self.logActionsFileName = 'actionsLog.txt'
     
-    '' Play some random times to get initial dataset 
-    about the enviroment (called train data) 
-    runs until it gets 50 good jobs.. ''
+    #Play some random times to get initial dataset 
+    #about the enviroment (called train data) 
+    #runs until it gets 50 good jobs..
     def BuildTrainingData(self):
         if os.path.isfile(self.trainingDataFileName):
             print('Using previously data trained')
