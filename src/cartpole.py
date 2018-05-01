@@ -9,7 +9,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 #importing code dependencies
 import numpy as np
 import tensorflow as tf
-try:
+try: # used to be safe about macOS and another computers.
     import matplotlib as mpl
     mpl.use('TkAgg')
     import mpl.pyplot as pl
@@ -33,6 +33,9 @@ class Cartpole:
         self.trainingDataFileName = 'saved.npy'
         self.logActionsFileName = 'actionsLog.txt'
     
+    '' Play some random times to get initial dataset 
+    about the enviroment (called train data) 
+    runs until it gets 50 good jobs.. ''
     def BuildTrainingData(self):
         if os.path.isfile(self.trainingDataFileName):
             print('Using previously data trained')
